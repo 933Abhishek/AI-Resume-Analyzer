@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Resume Analyzer</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input[type="file"] {
+      margin: 15px 0;
+    }
+
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #5a67d8;
+    }
+
+    .card {
+      text-align: left;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: #f7f7f7;
+    }
+
+    .score {
+      font-size: 22px;
+      font-weight: bold;
+      color: green;
+    }
+
+    .skills span {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 5px 10px;
+      margin: 5px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+
+    .suggestions {
+      color: #444;
+      margin-top: 10px;
+    }
+
+    pre {
+      background: #111;
+      color: #0f0;
+      padding: 10px;
+      overflow-x: auto;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>AI Resume Analyzer 🔥</h2>
+
+  <input type="file" id="file">
+  <br>
+  <button id="btn">Analyze Resume</button>
+
+  <div id="result"></div>
+
+</div>
+
+<script>
+document.getElementById("btn").addEventListener("click", async () => {
+
+  const file = document.getElementById("file").files[0];
+
+  if (!file) {
+    alert("Select file first");
+    return;
+  }
+
+  const form = new FormData();
+  form.append("resume", file);
+
+  const resultDiv = document.getElementById("result");
+  resultDiv.innerHTML = "⏳ Analyzing...";
+
+  try {
+    const res = await fetch("/upload", {
+      method: "POST",
+      body: form
+    });
+
+    const data = await res.json();
+
+    resultDiv.innerHTML = `
+      <div class="card">
+        <div class="score">🔥 Score: ${data.score}/100</div>
+
+        <div class="skills">
+          <h4>🛠 Skills:</h4>
+          ${data.skills.length 
+            ? data.skills.map(s => `<span>${s}</span>`).join("") 
+            : "No skills found"}
+        </div>
+
+        <div class="suggestions">
+          <h4>💡 Suggestions:</h4>
+          <p>${data.suggestions.replace(/\n/g, "<br>")}</p>
+        </div>
+
+        <h4>📄 Resume Text:</h4>
+        <pre>${data.text}</pre>
+      </div>
+    `;
+
+  } catch (err) {
+    resultDiv.innerHTML = "❌ Error connecting to server";
+  }
+
+});
+</script>
+
+</body>
+</html>
